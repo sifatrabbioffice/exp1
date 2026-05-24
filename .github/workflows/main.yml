@@ -23,30 +23,30 @@ jobs:
     - name: Checkout Code Base
       uses: actions/checkout@v4
 
-    # ২. প্রয়োজনীয় এনভায়রনমেন্ট ও টুলস সেটআপ (Frida, Radare2, Class-Dump Tools)
+# ২. সমস্ত প্রয়োজনীয় টুলস ইনস্টল করা (PEP 668 Error Fixed)
     - name: Setup Multi-Tool Reverse Engineering Environment
       run: |
         echo "=================================================="
         echo "🚀 Installing Advanced Reverse Engineering Toolchain..."
         echo "=================================================="
         
-        # Python এবং Pip এনভায়রনমেন্ট নিশ্চিত করা (Frida-tools এর জন্য)
-        python3 -m pip install --upgrade pip
-        pip3 install frida-tools
-
         # Homebrew এর মাধ্যমে Radare2, JQ, Wget ইনস্টল
-        brew install radare2 jq wget
+        brew install radare2 jq wget pipx
         
-        # dsdump ইনস্টল করা (Modern class-dump এর বিকল্প যা Swift 5+ সাপোর্ট করে)
+        # dsdump ইনস্টল করা (Modern class-dump যা Swift 5+ সাপোর্ট করে)
         brew tap derekselander/funpack
         brew install dsdump
 
-        # এনভায়রনমেন্ট ভেরিফিকেশন লগ
-        echo "--- Tool Versions ---"
-        frida --version || echo "Frida setup error"
-        r2 -v || echo "Radare2 setup error"
-        dsdump --version || echo "dsdump setup error"
+        # পাইথন এক্সটার্নাল এনভায়রনমেন্ট এরর ফিক্স করে Frida ইনস্টল করা
+        echo "📦 Installing Frida via Python with system bypass..."
+        python3 -m pip install --upgrade pip --break-system-packages
+        pip3 install frida-tools --break-system-packages
 
+        # এনভায়রনমেন্ট ভেরিফিকেশন লগ
+        echo "--- Tool Versions Verification ---"
+        frida --version || echo "⚠️ Frida setup error"
+        r2 -v || echo "⚠️ Radare2 setup error"
+        dsdump --version || echo "⚠️ dsdump setup error"
     # ৩. টার্গেট IPA ফাইল ডাউনলোড
     - name: Fetch and Verify Target IPA
       run: |
